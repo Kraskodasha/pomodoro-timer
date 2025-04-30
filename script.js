@@ -17,9 +17,11 @@ function format(value) {
   }
 }
 
-function toggle(minutes, seconds) {
+function toggle(min, sec) {
   clearInterval(startTimer);
-  timer.textContent = `${format(minutes)}:${format(seconds)}`;
+  timer.textContent = `${format(min)}:${format(sec)}`;
+  minutes = min;
+  seconds = sec;
 }
 
 function switchingTimer() {
@@ -40,14 +42,8 @@ function switchingTimer() {
         timer.textContent = `${format(minutes)}:${format(seconds)}`;
       }
 
-      if (minutes == 0 && seconds == 0 && mode == "pomodoro") {
-        toggle(25, 0);
-        startButton.textContent = "start";
-      }
-
-      if (minutes == 0 && seconds == 0 && mode == "break") {
-        toggle(5, 0);
-        startButton.textContent = "start";
+      if (minutes == 0 && seconds == 0) {
+        stopTimer();
       }
     }, 10);
 
@@ -57,34 +53,33 @@ function switchingTimer() {
   isPaused = !isPaused;
 }
 
+function stopTimer() {
+  startButton.textContent = "start";
+  isPaused = true;
+  if (mode == "pomodoro") {
+    toggle(25, 0);
+  } else {
+    toggle(5, 0);
+  }
+  clearInterval(startTimer);
+}
+
 startButton.addEventListener('click', switchingTimer);
 
 breakButton.addEventListener('click', function () {
   mode = "break";
-  isPaused = true;
-  clearInterval(startTimer);
-  minutes = 5;
-  seconds = 0;
-  timer.textContent = `${format(minutes)}:${format(seconds)}`;
+  stopTimer();
   breakButton.classList.add('active');
   pomodoroButton.classList.remove('active');
 });
 
 pomodoroButton.addEventListener('click', function () {
   mode = "pomodoro";
-  isPaused != true;
-  toggle(25, 0);
+  stopTimer();
   breakButton.classList.remove('active');
   pomodoroButton.classList.add('active');
 });
 
 resetButton.addEventListener('click', function () {
-  startButton.textContent = "start";
-  isPaused = false;
-
-  if (mode == "pomodoro") {
-    toggle(25, 0);
-  } else {
-    toggle(5, 0);
-  }
+  stopTimer();
 });
